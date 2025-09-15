@@ -19,7 +19,7 @@ public class CommandHandler {
     }
 
     private void handleDefault(String[] args) {
-        System.out.println();
+        System.out.println(args[0] + ": command not found");
     }
 
     public void handleCommand(String input) {
