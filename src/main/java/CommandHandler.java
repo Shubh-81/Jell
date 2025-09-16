@@ -1,11 +1,14 @@
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class CommandHandler {
     private final HashMap<String, Consumer<String[]>> commands = new HashMap<>();
+    private final String[] paths;
 
-    public CommandHandler() {
+    public CommandHandler(String path) {
+        paths = path.split(":");
         commands.put("echo", this::handleEcho);
         commands.put("exit", this::handleExit);
         commands.put("type", this::handleType);
@@ -32,10 +35,31 @@ public class CommandHandler {
             throw new RuntimeException("Invalid command, expected: type <args>");
         }
 
-        if (commands.containsKey((args[1]))) {
-            System.out.println(args[1] + " is a shell builtin");
+        String command = args[1];
+
+        if (commands.containsKey((command))) {
+            System.out.println(command + " is a shell builtin");
         } else {
-            System.out.println(args[1] + ": not found");
+            boolean found = false;
+
+            for (String path: paths) {
+                if (path.startsWith("$")) {
+                    break;
+                }
+
+                String fullPath = path + "/" + command;
+                File file = new File(fullPath);
+                
+                if (file.exists() && file.canExecute()) {
+                    System.out.println(command + " is " + fullPath);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                System.out.println(command + ": not found");
+            }
         }
     }
 
