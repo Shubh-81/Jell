@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -10,7 +11,15 @@ public class CommandHandler {
     }
 
     private void handleEcho(String[] args) {
+        if (args.length < 2) {
+            throw new RuntimeException("Invalid command, expected: echo <args>");
+        }
 
+        for (int i = 1; i < args.length; i++) {
+            System.out.print(args[i] + " ");
+        }
+
+        System.out.println();
     }
 
     private void handleExit(String[] args) {

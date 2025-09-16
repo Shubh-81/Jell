@@ -6,10 +6,14 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         CommandHandler commandHandler = new CommandHandler();
         while (true) {
-            System.out.print("$ ");
-            String input = br.readLine();
+            try {
+                System.out.print("$ ");
+                String input = br.readLine();
 
-            commandHandler.handleCommand(input);
+                commandHandler.handleCommand(input);
+            } catch (RuntimeException e) {
+                System.out.println("Faced exception " + e.getMessage());
+            }
         }
     }
 }
