@@ -8,6 +8,7 @@ public class CommandHandler {
     public CommandHandler() {
         commands.put("echo", this::handleEcho);
         commands.put("exit", this::handleExit);
+        commands.put("type", this::handleType);
     }
 
     private void handleEcho(String[] args) {
@@ -24,6 +25,18 @@ public class CommandHandler {
 
     private void handleExit(String[] args) {
         System.exit(0);
+    }
+
+    private void handleType(String[] args) {
+        if (args.length < 2) {
+            throw new RuntimeException("Invalid command, expected: type <args>");
+        }
+
+        if (commands.containsKey((args[1]))) {
+            System.out.println(args[1] + " is a shell builtin");
+        } else {
+            System.out.println(args[1] + ": not found");
+        }
     }
 
     private void handleDefault(String[] args) {
