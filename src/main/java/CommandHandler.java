@@ -14,6 +14,11 @@ public class CommandHandler {
         commands.put("echo", this::handleEcho);
         commands.put("exit", this::handleExit);
         commands.put("type", this::handleType);
+        commands.put("pwd", this::handlePwd);
+    }
+
+    private void handlePwd(String[] args) {
+        System.out.println(System.getProperty("user.dir"));
     }
 
     private void handleEcho(String[] args) {
