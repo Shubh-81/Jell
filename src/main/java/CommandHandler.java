@@ -79,8 +79,10 @@ public class CommandHandler {
 
             if (file.exists() && file.canExecute()) {
                 try {
-                    Process process = Runtime.getRuntime().exec(args);
-
+                    ProcessBuilder processBuilder = new ProcessBuilder(args);
+                    processBuilder.directory(new File(path));
+                    Process process = processBuilder.start();
+                    
                     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     String line;
                     while ((line = reader.readLine()) != null) {
