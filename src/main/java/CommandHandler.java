@@ -31,7 +31,7 @@ public class CommandHandler {
         if (file.exists() && file.isDirectory()) {
             System.setProperty("user.dir", file.getAbsolutePath());
         } else {
-            System.out.println("cd: " + args[0] + ": No such file or directory");
+            System.out.println("cd: " + args[1] + ": No such file or directory");
         }
     }
 
