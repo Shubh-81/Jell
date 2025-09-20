@@ -78,8 +78,6 @@ public class CommandHandler {
             File file = new File(fullPath);
 
             if (file.exists() && file.canExecute()) {
-                args[0] = fullPath;
-
                 try {
                     Process process = Runtime.getRuntime().exec(args);
 
