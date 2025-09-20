@@ -78,6 +78,7 @@ public class CommandHandler {
             File file = new File(fullPath);
 
             if (file.exists() && file.canExecute()) {
+                found = true;
                 try {
                     ProcessBuilder processBuilder = new ProcessBuilder(args);
                     processBuilder.directory(new File(path));
@@ -91,6 +92,7 @@ public class CommandHandler {
                 } catch (IOException e) {
                     System.out.println("Error while executing command: " + e.getMessage());
                 }
+                break;
             }
         }
 
