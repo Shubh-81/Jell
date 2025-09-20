@@ -15,10 +15,24 @@ public class CommandHandler {
         commands.put("exit", this::handleExit);
         commands.put("type", this::handleType);
         commands.put("pwd", this::handlePwd);
+        commands.put("cd", this::handleCd);
     }
 
     private void handlePwd(String[] args) {
         System.out.println(System.getProperty("user.dir"));
+    }
+
+    private void handleCd(String[] args) {
+        if (args.length != 2) {
+            throw new RuntimeException("Invalid command, expected: cd <dir>");
+        }
+
+        File file = new File(args[1]);
+        if (file.exists() && file.isDirectory()) {
+            System.setProperty("user.dir", file.getAbsolutePath());
+        } else {
+            System.out.println("cd: " + args[0] + ": No such file or directory");
+        }
     }
 
     private void handleEcho(String[] args) {
