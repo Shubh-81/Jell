@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -64,7 +66,37 @@ public class CommandHandler {
     }
 
     private void handleDefault(String[] args) {
-        System.out.println(args[0] + ": command not found");
+        String command = args[0];
+        boolean found = false;
+
+        for (String path: paths) {
+            if (path.startsWith("$")) {
+                break;
+            }
+
+            String fullPath = path + "/" + command;
+            File file = new File(fullPath);
+
+            if (file.exists() && file.canExecute()) {
+                args[0] = fullPath;
+
+                try {
+                    Process process = Runtime.getRuntime().exec(args);
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                } catch (IOException e) {
+                    System.out.println("Error while executing command: " + e.getMessage());
+                }
+            }
+        }
+
+        if (!found) {
+            System.out.println(command + ": not found");
+        }
     }
 
     public void handleCommand(String input) {
