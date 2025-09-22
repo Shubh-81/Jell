@@ -35,15 +35,20 @@ public class CommandHandler {
         List<String> finalPath = new ArrayList<>(Arrays.asList(currPath.split("/")));
         List<String> argPath =  new ArrayList<>(Arrays.asList(args[1].split("/")));
 
+        boolean isRelative = false;
+
         for (String curr: argPath) {
             curr = curr.trim();
             if (curr.equals(".")) {
+                isRelative = true;
                 continue;
             } else if (curr.equals("..")) {
+                isRelative = true;
                 if (!finalPath.isEmpty()) {
                     finalPath.remove(finalPath.size() - 1);
                 }
             } else {
+                if (!isRelative)    finalPath.clear();
                 finalPath.add(curr);
             }
         }
