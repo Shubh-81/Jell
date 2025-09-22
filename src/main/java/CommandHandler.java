@@ -3,7 +3,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CommandHandler {
     private final HashMap<String, Consumer<String[]>> commands = new HashMap<>();
@@ -27,11 +30,34 @@ public class CommandHandler {
             throw new RuntimeException("Invalid command, expected: cd <dir>");
         }
 
-        File file = new File(args[1]);
+        String currPath = System.getProperty("user.dir");
+
+        List<String> finalPath = new ArrayList<>(Arrays.asList(currPath.split("/")));
+        List<String> argPath =  new ArrayList<>(Arrays.asList(args[1].split("/")));
+
+        for (String curr: argPath) {
+            curr = curr.trim();
+            if (curr.equals(".")) {
+                continue;
+            } else if (curr.equals("..")) {
+                if (!finalPath.isEmpty()) {
+                    finalPath.remove(finalPath.size() - 1);
+                }
+            } else {
+                finalPath.add(curr);
+            }
+        }
+
+        String res = String.join("/", finalPath);
+        if (res.length() == 0) {
+            res = "/";
+        }
+
+        File file = new File(res);
         if (file.exists() && file.isDirectory()) {
             System.setProperty("user.dir", file.getAbsolutePath());
         } else {
-            System.out.println("cd: " + args[1] + ": No such file or directory");
+            System.out.println("cd: " + res + ": No such file or directory");
         }
     }
 

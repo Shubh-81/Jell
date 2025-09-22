@@ -15,6 +15,8 @@ public class Main {
 
                 commandHandler.handleCommand(input);
             } catch (RuntimeException e) {
+                System.out.println("Faced runtime exception " + e.getMessage());
+            } catch (Exception e) {
                 System.out.println("Faced exception " + e.getMessage());
             }
         }
