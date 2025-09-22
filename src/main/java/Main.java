@@ -5,9 +5,10 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         String path = System.getenv("PATH");
+        String homePath = System.getenv("HOME");
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        CommandHandler commandHandler = new CommandHandler(path);
+        CommandHandler commandHandler = new CommandHandler(path, homePath);
         while (true) {
             try {
                 System.out.print("$ ");

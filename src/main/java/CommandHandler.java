@@ -11,9 +11,11 @@ import java.util.Arrays;
 public class CommandHandler {
     private final HashMap<String, Consumer<String[]>> commands = new HashMap<>();
     private final String[] paths;
+    private final String[] homePath;
 
-    public CommandHandler(String path) {
+    public CommandHandler(String path, String homePath) {
         paths = path.split(":");
+        this.homePath = homePath.split("/");
         commands.put("echo", this::handleEcho);
         commands.put("exit", this::handleExit);
         commands.put("type", this::handleType);
@@ -35,7 +37,7 @@ public class CommandHandler {
         List<String> finalPath = new ArrayList<>(Arrays.asList(currPath.split("/")));
         List<String> argPath =  new ArrayList<>(Arrays.asList(args[1].split("/")));
 
-        if (!argPath.isEmpty() && argPath.get(0).length() == 0) {
+        if (!argPath.isEmpty() && (argPath.get(0).length() == 0 || argPath.get(0).equals("~"))) {
             finalPath.clear();
         }
 
@@ -46,6 +48,12 @@ public class CommandHandler {
             } else if (curr.equals("..")) {
                 if (!finalPath.isEmpty()) {
                     finalPath.remove(finalPath.size() - 1);
+                }
+            } else if (curr.equals("~")) {
+                for (String path: homePath) {
+                    path = path.trim();
+                    if (path.length() == 0) continue;
+                    finalPath.add(path);
                 }
             } else {
                 finalPath.add(curr);
