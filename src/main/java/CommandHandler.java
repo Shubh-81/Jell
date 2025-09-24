@@ -163,13 +163,7 @@ public class CommandHandler {
 
         for (char ch: input.toCharArray()) {
             if (ch == '\'') {
-                if (isOpen) {
-                    args.add(curr);
-                    isOpen = false;
-                    curr = "";
-                } else {
-                    isOpen = true;
-                }
+                isOpen = !isOpen;
             } else if (ch == ' ' && !isOpen) {
                 if (curr.length() > 0)  args.add(curr);
                 curr = "";
