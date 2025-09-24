@@ -162,7 +162,8 @@ public class CommandHandler {
         boolean isOpen2 = false;
         String curr = "";
 
-        for (char ch: input.toCharArray()) {
+        for (int i = 0; i < input.length(); i++) {
+            char ch = input.charAt(i);
             if (ch == '\'' && !isOpen2) {
                 isOpen1 = !isOpen1;
             } else if (ch == '\"' && !isOpen1) {
@@ -170,6 +171,10 @@ public class CommandHandler {
             } else if (ch == ' ' && !isOpen1 && !isOpen2) {
                 if (curr.length() > 0)  args.add(curr);
                 curr = "";
+            } else if (ch == '\\' && !isOpen1 && !isOpen2) {
+                if (i == (input.length() - 1))  continue;
+                curr += input.charAt(i + 1);
+                i += 1;
             } else {
                 curr += ch;
             }
