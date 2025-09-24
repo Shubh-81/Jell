@@ -173,7 +173,11 @@ public class CommandHandler {
                 curr = "";
             } else if (ch == '\\' && !isOpen1) {
                 if (i == (input.length() - 1))  continue;
-                curr += input.charAt(i + 1);
+                char ch2 = input.charAt(i + 1);
+                if (isOpen2 && ch2 != '\"' && ch2 != '\\' && ch2 != '$' && ch2 != '`') {
+                    continue;
+                }
+                curr += ch2;
                 i += 1;
             } else {
                 curr += ch;
@@ -183,6 +187,8 @@ public class CommandHandler {
         if (curr.length() > 0) {
             args.add(curr);
         }
+
+        System.out.println(args);
 
         commands.getOrDefault(args.get(0), this::handleDefault).accept(args.toArray(new String[0]));
     }
