@@ -157,7 +157,31 @@ public class CommandHandler {
     }
 
     public void handleCommand(String input) {
-        String[] args = input.trim().split(" ");
-        commands.getOrDefault(args[0], this::handleDefault).accept(args);
+        ArrayList<String> args = new ArrayList<>();
+        boolean isOpen = false;
+        String curr = "";
+
+        for (char ch: input.toCharArray()) {
+            if (ch == '\'') {
+                if (isOpen) {
+                    args.add(curr);
+                    isOpen = false;
+                    curr = "";
+                } else {
+                    isOpen = true;
+                }
+            } else if (ch == ' ' && !isOpen) {
+                args.add(curr);
+                curr = "";
+            } else {
+                curr += ch;
+            }
+        }
+
+        if (curr.length() > 0) {
+            args.add(curr);
+        }
+
+        commands.getOrDefault(args.get(0), this::handleDefault).accept(args.toArray(new String[0]));
     }
 }
