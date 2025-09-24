@@ -172,9 +172,13 @@ public class CommandHandler {
                 if (curr.length() > 0)  args.add(curr);
                 curr = "";
             } else if (ch == '\\' && !isOpen1) {
-                if (i == (input.length() - 1))  continue;
+                if (i == (input.length() - 1)) {
+                    curr += '\\';
+                    continue;
+                }
                 char ch2 = input.charAt(i + 1);
                 if (isOpen2 && ch2 != '\"' && ch2 != '\\' && ch2 != '$' && ch2 != '`') {
+                    curr += '\\';
                     continue;
                 }
                 curr += ch2;
