@@ -158,13 +158,16 @@ public class CommandHandler {
 
     public void handleCommand(String input) {
         ArrayList<String> args = new ArrayList<>();
-        boolean isOpen = false;
+        boolean isOpen1 = false;
+        boolean isOpen2 = false;
         String curr = "";
 
         for (char ch: input.toCharArray()) {
-            if (ch == '\'') {
-                isOpen = !isOpen;
-            } else if (ch == ' ' && !isOpen) {
+            if (ch == '\'' && !isOpen2) {
+                isOpen1 = !isOpen1;
+            } else if (ch == '\"' && !isOpen1) {
+                isOpen2 = !isOpen2;
+            } else if (ch == ' ' && !isOpen1 && !isOpen2) {
                 if (curr.length() > 0)  args.add(curr);
                 curr = "";
             } else {
