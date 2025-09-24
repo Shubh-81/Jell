@@ -188,8 +188,6 @@ public class CommandHandler {
             args.add(curr);
         }
 
-        System.out.println(args);
-
         commands.getOrDefault(args.get(0), this::handleDefault).accept(args.toArray(new String[0]));
     }
 }
