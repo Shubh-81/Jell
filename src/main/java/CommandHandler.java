@@ -171,7 +171,7 @@ public class CommandHandler {
             } else if (ch == ' ' && !isOpen1 && !isOpen2) {
                 if (curr.length() > 0)  args.add(curr);
                 curr = "";
-            } else if (ch == '\\' && !isOpen1 && !isOpen2) {
+            } else if (ch == '\\' && !isOpen1) {
                 if (i == (input.length() - 1))  continue;
                 curr += input.charAt(i + 1);
                 i += 1;
