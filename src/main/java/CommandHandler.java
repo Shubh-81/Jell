@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -12,10 +13,15 @@ public class CommandHandler {
     private final HashMap<String, Consumer<String[]>> commands = new HashMap<>();
     private final String[] paths;
     private final String[] homePath;
+    private Boolean outputRedirect;
+    private String outputRedirectionPath;
 
     public CommandHandler(String path, String homePath) {
         paths = path.split(":");
         this.homePath = homePath.split("/");
+        this.outputRedirect = false;
+        this.outputRedirectionPath = "";
+
         commands.put("echo", this::handleEcho);
         commands.put("exit", this::handleExit);
         commands.put("type", this::handleType);
@@ -23,8 +29,23 @@ public class CommandHandler {
         commands.put("cd", this::handleCd);
     }
 
+    private void handleOutput(String output) {
+        if (!outputRedirect) {
+            System.out.println(output);
+            return;
+        }
+
+        try {
+            FileWriter fw = new FileWriter(outputRedirectionPath);
+            fw.write(output);
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error while writing output: " + e.getMessage());
+        }
+    }
+
     private void handlePwd(String[] args) {
-        System.out.println(System.getProperty("user.dir"));
+        handleOutput(System.getProperty("user.dir"));
     }
 
     private void handleCd(String[] args) {
@@ -67,7 +88,7 @@ public class CommandHandler {
         if (file.exists() && file.isDirectory()) {
             System.setProperty("user.dir", file.getAbsolutePath());
         } else {
-            System.out.println("cd: " + res + ": No such file or directory");
+            handleOutput("cd: " + res + ": No such file or directory");
         }
     }
 
@@ -76,11 +97,12 @@ public class CommandHandler {
             throw new RuntimeException("Invalid command, expected: echo <args>");
         }
 
+        String res = "";
         for (int i = 1; i < args.length; i++) {
-            System.out.print(args[i] + " ");
+            res += args[i] + " ";
         }
 
-        System.out.println();
+        handleOutput(res);
     }
 
     private void handleExit(String[] args) {
@@ -95,7 +117,7 @@ public class CommandHandler {
         String command = args[1];
 
         if (commands.containsKey((command))) {
-            System.out.println(command + " is a shell builtin");
+            handleOutput(command + " is a shell builtin");
         } else {
             boolean found = false;
 
@@ -108,14 +130,14 @@ public class CommandHandler {
                 File file = new File(fullPath);
                 
                 if (file.exists() && file.canExecute()) {
-                    System.out.println(command + " is " + fullPath);
+                    handleOutput(command + " is " + fullPath);
                     found = true;
                     break;
                 }
             }
 
             if (!found) {
-                System.out.println(command + ": not found");
+                handleOutput(command + ": not found");
             }
         }
     }
@@ -142,7 +164,7 @@ public class CommandHandler {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        System.out.println(line);
+                        handleOutput(line);
                     }
                 } catch (IOException e) {
                     System.out.println("Error while executing command: " + e.getMessage());
@@ -152,7 +174,7 @@ public class CommandHandler {
         }
 
         if (!found) {
-            System.out.println(command + ": not found");
+            handleOutput(command + ": not found");
         }
     }
 
@@ -161,6 +183,9 @@ public class CommandHandler {
         boolean isOpen1 = false;
         boolean isOpen2 = false;
         String curr = "";
+
+        outputRedirect = false;
+        outputRedirectionPath = "";
 
         for (int i = 0; i < input.length(); i++) {
             char ch = input.charAt(i);
@@ -190,6 +215,18 @@ public class CommandHandler {
 
         if (curr.length() > 0) {
             args.add(curr);
+        }
+
+        if (args.contains(">") || args.contains("1>")) {
+            outputRedirect = true;
+            int idx = args.contains(">") ? args.indexOf(">"): args.indexOf("1>");
+
+            if (idx < (args.size() - 1)) {
+                outputRedirectionPath = args.get(idx + 1);
+                args = new ArrayList<>(args.subList(0, idx));
+            } else {
+                outputRedirect = false;
+            }
         }
 
         commands.getOrDefault(args.get(0), this::handleDefault).accept(args.toArray(new String[0]));
