@@ -166,10 +166,23 @@ public class CommandHandler {
                     
                     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     String line;
+                    ArrayList<String> output = new ArrayList<>();
+
                     while ((line = reader.readLine()) != null) {
-                        handleOutput(line);
+                        output.add(line);
                     }
-                } catch (IOException e) {
+
+                    if (process.waitFor() != 0) {
+                        BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                        while ((line = errorReader.readLine()) != null) {
+                            System.out.println(line);
+                        }
+                    }
+
+                    for (String out: output) {
+                        handleOutput(out);
+                    }
+                } catch (IOException | InterruptedException e) {
                     System.out.println("Error while executing command: " + e.getMessage());
                 }
                 break;
