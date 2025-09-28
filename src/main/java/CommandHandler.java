@@ -14,6 +14,7 @@ public class CommandHandler {
     private final String[] paths;
     private final String[] homePath;
     private Boolean outputRedirect;
+    private Boolean errorRedirect;
     private String outputRedirectionPath;
     private Boolean firstOutput;
 
@@ -33,6 +34,22 @@ public class CommandHandler {
 
     private void handleOutput(String output) {
         if (!outputRedirect) {
+            System.out.println(output);
+            return;
+        }
+
+        try {
+            FileWriter fw = new FileWriter(outputRedirectionPath, !firstOutput);
+            firstOutput = false;
+            fw.write(output + "\n");
+            fw.close();
+        } catch (IOException e) {
+            System.out.println("Error while writing output: " + e.getMessage());
+        }
+    }
+
+    private void handleErrorOutput(String output) {
+        if (!errorRedirect) {
             System.out.println(output);
             return;
         }
@@ -166,21 +183,15 @@ public class CommandHandler {
                     
                     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     String line;
-                    ArrayList<String> output = new ArrayList<>();
-
                     while ((line = reader.readLine()) != null) {
-                        output.add(line);
+                        handleOutput(line);
                     }
 
                     if (process.waitFor() != 0) {
                         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
                         while ((line = errorReader.readLine()) != null) {
-                            System.out.println(line);
+                            handleErrorOutput(line);
                         }
-                    }
-
-                    for (String out: output) {
-                        handleOutput(out);
                     }
                 } catch (IOException | InterruptedException e) {
                     System.out.println("Error while executing command: " + e.getMessage());
@@ -243,6 +254,18 @@ public class CommandHandler {
                 args = new ArrayList<>(args.subList(0, idx));
             } else {
                 outputRedirect = false;
+            }
+        }
+
+        if (args.contains("2>")) {
+            errorRedirect = true;
+            int idx = args.indexOf("2>");
+
+            if (idx < (args.size() - 1)) {
+                outputRedirectionPath = args.get(idx + 1);
+                args = new ArrayList<>(args.subList(0, idx));
+            } else {
+                errorRedirect = false;
             }
         }
 
