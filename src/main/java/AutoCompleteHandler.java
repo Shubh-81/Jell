@@ -4,11 +4,19 @@ public class AutoCompleteHandler {
 
     public String autoComplete(String input) {
         String match = "";
+
         for (String command: builtinCommands) {
             if (command.startsWith(input)) {
-                if (match.length() != 0)    return "";
+                if (match.length() != 0) {
+                    System.out.print('\007');
+                    return "";
+                }
                 match = command.substring(input.length());
             }
+        }
+
+        if (match.length() == 0) {
+            System.out.print('\007');
         }
 
         return match;
