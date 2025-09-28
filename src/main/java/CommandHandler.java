@@ -264,6 +264,19 @@ public class CommandHandler {
             }
         }
 
+        if (args.contains(">>") || args.contains("1>>")) {
+            outputRedirect = true;
+            firstOutput = false;
+            int idx = args.contains(">>") ? args.indexOf(">>"): args.indexOf("1>>");
+
+            if (idx < (args.size() - 1)) {
+                outputRedirectionPath = args.get(idx + 1);
+                args = new ArrayList<>(args.subList(0, idx));
+            } else {
+                outputRedirect = false;
+            }
+        }
+
         if (args.contains("2>")) {
             errorRedirect = true;
             int idx = args.indexOf("2>");
