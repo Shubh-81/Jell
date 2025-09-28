@@ -46,7 +46,6 @@ public class Main {
                         char c = (char)ch;
                         if (c == '\t') {
                             String completion = autoCompleteHandler.autoComplete(input);
-                            if (completion.length() > 0)    completion += " ";
                             input += completion;
                             System.out.print(completion);
                         } else if (c == '\n' || c == '\r') {
@@ -65,6 +64,8 @@ public class Main {
                     }
                 } catch (RuntimeException e) {
                     System.out.println("Faced runtime exception " + e.getMessage());
+                    System.out.println(e.getStackTrace().toString());
+                    throw new RuntimeException(e);
                 } catch (Exception e) {
                     System.out.println("Faced exception " + e.getMessage());
                 }

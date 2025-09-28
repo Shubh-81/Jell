@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class AutoCompleteHandler {
 
@@ -15,11 +17,34 @@ public class AutoCompleteHandler {
         commands = executables;
     }
 
-    private void handleMultipleMatches(String input, ArrayList<String> matches) {
+    private String handleMultipleMatches(String input, Set<String> matches) {
+        String prefix = null;
+        for (String match: matches) {
+            if (prefix == null) {
+                prefix = match;
+                continue;
+            }
+            int l = Math.min(prefix.length(), match.length());
+            for (int i = 0; i <= l; i++) {
+                if (i == l || prefix.charAt(i) != match.charAt(i)) {
+                    if (i == 0) {
+                        prefix = "";
+                        break;
+                    }
+                    prefix = prefix.substring(0, i);
+                    break;
+                }
+            }
+        }
+
+        if (prefix != null && prefix.length() > 0) {
+            return prefix;
+        }
+
         if (firstTab) {
             System.out.print('\007');
             firstTab = !firstTab;
-            return;
+            return "";
         }
 
         System.out.print("\n\r");
@@ -28,12 +53,13 @@ public class AutoCompleteHandler {
         }
 
         System.out.print("\n\r$ " + input);
+        return "";
     }
 
     public String autoComplete(String input) {
         String match = "";
+        Set<String> matches = new TreeSet<>();
 
-        ArrayList<String> matches = new ArrayList<>();
 
         for (String command: commands) {
             if (command.startsWith(input)) {
@@ -43,10 +69,9 @@ public class AutoCompleteHandler {
         }
 
         if (matches.size() != 1) {
-            handleMultipleMatches(input, matches);
-            return "";
+            return handleMultipleMatches(input, matches);
         }
 
-        return match;
+        return match + " ";
     }
 }
