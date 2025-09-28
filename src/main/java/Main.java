@@ -1,15 +1,39 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Main {
+
+    private static Set<String> getExecutables(String path) {
+        String[] paths = path.split(":");
+        Set<String> executables = new HashSet<>();
+
+        for (String currPath: paths) {
+            File dir = new File(currPath);
+            File[] files = dir.listFiles();
+
+            if (files == null)  continue;
+
+            for (File file: files) {
+                if (file != null && file.isFile() && file.canExecute()) executables.add(file.getName());
+            }
+        }
+
+        return executables;
+    }
     public static void main(String[] args) throws Exception {
         Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "stty raw -echo < /dev/tty"});
 
         String path = System.getenv("PATH");
         String homePath = System.getenv("HOME");
 
+        Set<String> executables = getExecutables(path);
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        AutoCompleteHandler autoCompleteHandler = new AutoCompleteHandler();
+        AutoCompleteHandler autoCompleteHandler = new AutoCompleteHandler(executables);
         CommandHandler commandHandler = new CommandHandler(path, homePath);
 
         try {

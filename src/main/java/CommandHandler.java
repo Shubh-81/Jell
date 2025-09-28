@@ -126,6 +126,11 @@ public class CommandHandler {
     }
 
     private void handleExit(String[] args) {
+        try {
+            Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "stty cooked echo < /dev/tty"});
+        } catch (IOException e) {
+            System.out.println("Faced IOException: " + e.getMessage());
+        }
         System.exit(0);
     }
 
