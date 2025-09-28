@@ -15,12 +15,14 @@ public class CommandHandler {
     private final String[] homePath;
     private Boolean outputRedirect;
     private String outputRedirectionPath;
+    private Boolean firstOutput;
 
     public CommandHandler(String path, String homePath) {
         paths = path.split(":");
         this.homePath = homePath.split("/");
         this.outputRedirect = false;
         this.outputRedirectionPath = "";
+        this.firstOutput = true;
 
         commands.put("echo", this::handleEcho);
         commands.put("exit", this::handleExit);
@@ -36,7 +38,8 @@ public class CommandHandler {
         }
 
         try {
-            FileWriter fw = new FileWriter(outputRedirectionPath);
+            FileWriter fw = new FileWriter(outputRedirectionPath, !firstOutput);
+            firstOutput = false;
             fw.write(output);
             fw.close();
         } catch (IOException e) {
@@ -186,6 +189,7 @@ public class CommandHandler {
 
         outputRedirect = false;
         outputRedirectionPath = "";
+        firstOutput = true;
 
         for (int i = 0; i < input.length(); i++) {
             char ch = input.charAt(i);
