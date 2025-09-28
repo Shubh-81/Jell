@@ -38,7 +38,7 @@ public class CommandHandler {
         }
 
         try {
-            FileWriter fw = new FileWriter(outputRedirectionPath, !firstOutput);
+            FileWriter fw = new FileWriter(outputRedirectionPath + "\n", !firstOutput);
             firstOutput = false;
             fw.write(output);
             fw.close();
