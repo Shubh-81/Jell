@@ -38,9 +38,9 @@ public class CommandHandler {
         }
 
         try {
-            FileWriter fw = new FileWriter(outputRedirectionPath + "\n", !firstOutput);
+            FileWriter fw = new FileWriter(outputRedirectionPath, !firstOutput);
             firstOutput = false;
-            fw.write(output);
+            fw.write(output + "\n");
             fw.close();
         } catch (IOException e) {
             System.out.println("Error while writing output: " + e.getMessage());
