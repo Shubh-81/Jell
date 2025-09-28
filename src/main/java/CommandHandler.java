@@ -189,8 +189,14 @@ public class CommandHandler {
 
                     if (process.waitFor() != 0) {
                         BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                        boolean isErrorEmpty = true;
                         while ((line = errorReader.readLine()) != null) {
                             handleErrorOutput(line);
+                            isErrorEmpty = false;
+                        }
+
+                        if (isErrorEmpty) {
+                            handleErrorOutput("");
                         }
                     }
                 } catch (IOException | InterruptedException e) {
@@ -212,6 +218,7 @@ public class CommandHandler {
         String curr = "";
 
         outputRedirect = false;
+        errorRedirect = false;
         outputRedirectionPath = "";
         firstOutput = true;
 
@@ -263,6 +270,13 @@ public class CommandHandler {
 
             if (idx < (args.size() - 1)) {
                 outputRedirectionPath = args.get(idx + 1);
+                try {
+                    FileWriter fw = new FileWriter(outputRedirectionPath);
+                    fw.write("");
+                    fw.close();
+                } catch (IOException e) {
+                    System.out.println("Error while creating redirection file " + e.getMessage());
+                }
                 args = new ArrayList<>(args.subList(0, idx));
             } else {
                 errorRedirect = false;
