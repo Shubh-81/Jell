@@ -34,7 +34,7 @@ public class CommandHandler {
 
     private void handleOutput(String output) {
         if (!outputRedirect) {
-            System.out.println(output);
+            System.out.print(output + "\r\n");
             return;
         }
 
@@ -50,7 +50,7 @@ public class CommandHandler {
 
     private void handleErrorOutput(String output) {
         if (!errorRedirect) {
-            System.out.println(output);
+            System.out.print(output + "\r\n");
             return;
         }
 
@@ -329,7 +329,6 @@ public class CommandHandler {
                 errorRedirect = false;
             }
         }
-
         commands.getOrDefault(args.get(0), this::handleDefault).accept(args.toArray(new String[0]));
     }
 }
