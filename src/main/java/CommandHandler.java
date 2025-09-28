@@ -258,6 +258,13 @@ public class CommandHandler {
 
             if (idx < (args.size() - 1)) {
                 outputRedirectionPath = args.get(idx + 1);
+                try {
+                    FileWriter fw = new FileWriter(outputRedirectionPath, !firstOutput);
+                    fw.write("");
+                    fw.close();
+                } catch (IOException e) {
+                    System.out.println("Error while creating redirection file " + e.getMessage());
+                }
                 args = new ArrayList<>(args.subList(0, idx));
             } else {
                 outputRedirect = false;
@@ -271,6 +278,13 @@ public class CommandHandler {
 
             if (idx < (args.size() - 1)) {
                 outputRedirectionPath = args.get(idx + 1);
+                try {
+                    FileWriter fw = new FileWriter(outputRedirectionPath, !firstOutput);
+                    fw.write("");
+                    fw.close();
+                } catch (IOException e) {
+                    System.out.println("Error while creating redirection file " + e.getMessage());
+                }
                 args = new ArrayList<>(args.subList(0, idx));
             } else {
                 outputRedirect = false;
@@ -284,7 +298,27 @@ public class CommandHandler {
             if (idx < (args.size() - 1)) {
                 outputRedirectionPath = args.get(idx + 1);
                 try {
-                    FileWriter fw = new FileWriter(outputRedirectionPath);
+                    FileWriter fw = new FileWriter(outputRedirectionPath, !firstOutput);
+                    fw.write("");
+                    fw.close();
+                } catch (IOException e) {
+                    System.out.println("Error while creating redirection file " + e.getMessage());
+                }
+                args = new ArrayList<>(args.subList(0, idx));
+            } else {
+                errorRedirect = false;
+            }
+        }
+
+        if (args.contains("2>>")) {
+            errorRedirect = true;
+            firstOutput = false;
+            int idx = args.indexOf("2>>");
+
+            if (idx < (args.size() - 1)) {
+                outputRedirectionPath = args.get(idx + 1);
+                try {
+                    FileWriter fw = new FileWriter(outputRedirectionPath, !firstOutput);
                     fw.write("");
                     fw.close();
                 } catch (IOException e) {
