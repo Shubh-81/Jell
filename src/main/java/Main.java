@@ -1,14 +1,15 @@
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
 
-    private static Set<String> getExecutables(String path) {
+    private static HashMap<String, String> getExecutables(String path) {
         String[] paths = path.split(":");
-        Set<String> executables = new HashSet<>();
+        HashMap<String, String> executables = new HashMap<>();
 
         for (String currPath: paths) {
             File dir = new File(currPath);
@@ -17,7 +18,7 @@ public class Main {
             if (files == null)  continue;
 
             for (File file: files) {
-                if (file != null && file.isFile() && file.canExecute()) executables.add(file.getName());
+                if (file != null && file.isFile() && file.canExecute()) executables.put(file.getName(), file.getAbsolutePath());
             }
         }
 
@@ -29,11 +30,11 @@ public class Main {
         String path = System.getenv("PATH");
         String homePath = System.getenv("HOME");
 
-        Set<String> executables = getExecutables(path);
+        HashMap<String, String> executables = getExecutables(path);
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        AutoCompleteHandler autoCompleteHandler = new AutoCompleteHandler(executables);
-        CommandHandler commandHandler = new CommandHandler(path, homePath);
+        AutoCompleteHandler autoCompleteHandler = new AutoCompleteHandler(new HashSet<>(executables.keySet()));
+        CommandHandler commandHandler = new CommandHandler(path, homePath, executables);
 
         try {
             while (true) {
@@ -43,6 +44,10 @@ public class Main {
                     String input = "";
                     int ch;
                     while ((ch = br.read()) != -1) {
+                        if (ch == 3) {
+                            // System.out.print("\n\r");
+                            break;
+                        }
                         char c = (char)ch;
                         if (c == '\t') {
                             String completion = autoCompleteHandler.autoComplete(input);
@@ -65,6 +70,7 @@ public class Main {
                 } catch (RuntimeException e) {
                     System.out.println("Faced runtime exception " + e.getMessage());
                     System.out.println(e.getStackTrace().toString());
+                    Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "stty cooked echo < /dev/tty"});
                     throw new RuntimeException(e);
                 } catch (Exception e) {
                     System.out.println("Faced exception " + e.getMessage());
