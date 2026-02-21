@@ -1,5 +1,7 @@
 package commands;
 
+import customErrors.CommandException;
+import customErrors.InvalidArguments;
 import history.HistoryHandler;
 
 import java.io.InputStream;
@@ -22,9 +24,24 @@ public class HistoryCommand implements BaseCommand {
     }
 
     public void execute(InputStream in, OutputStream out) throws Exception {
-        List<String> historicalCommands = HistoryHandler.getPreviousCommands();
+        int maxHistory = -1;
+        if (args.size() > 1) {
+            try {
+                maxHistory = Integer.parseInt(args.get(1));
+            } catch (Exception e) {
+                throw new CommandException(getName(), new InvalidArguments());
+            }
+        }
 
-        for (int index = 0; index < historicalCommands.size(); index++) {
+        List<String> historicalCommands = HistoryHandler.getPreviousCommands();
+        int numCommands = historicalCommands.size();
+
+        int start = 0;
+        if (maxHistory > 0 && maxHistory < numCommands) {
+            start = numCommands - maxHistory;
+        }
+
+        for (int index = start; index < numCommands; index++) {
             String output = index + " " + historicalCommands.get(index);
             out.write(output.getBytes());
             out.write(NEW_LINE.getBytes());
