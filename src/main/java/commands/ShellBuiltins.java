@@ -6,7 +6,8 @@ public enum ShellBuiltins {
     EXIT("exit"),
     PWD("pwd"),
     TYPE("type"),
-    LIST_DIRECTORY("ls");
+    LIST_DIRECTORY("ls"),
+    HISTORY("history");
 
 
     private final String name;

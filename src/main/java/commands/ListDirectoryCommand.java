@@ -14,7 +14,6 @@ import java.util.List;
 import static utils.Constants.DASH;
 import static utils.Constants.DOT;
 import static utils.Constants.NEW_LINE;
-import static utils.Constants.TILDE;
 
 
 enum ListDirectoryFlag {
@@ -49,15 +48,13 @@ public class ListDirectoryCommand implements BaseCommand {
     }
 
     public void execute(InputStream in, OutputStream out) throws Exception {
-
+        // Support to be added in the future
         boolean long_listing = false;
         boolean hidden_files = false;
         boolean time_sorted = false;
         boolean reverse = false;
 
         String seperator = SPACE;
-
-        int reqFileCount = -1;
 
         List<String> paths = null;
 

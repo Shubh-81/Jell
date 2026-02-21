@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import static utils.Constants.BLANK_SPACE;
-import static utils.Constants.CARRIAGE_RETURN;
 import static utils.Constants.NEW_LINE;
 
 public class PipelineCommand implements BaseCommand {

@@ -5,17 +5,20 @@ import static utils.Constants.DOLLAR_SIGN;
 import static utils.Constants.NEW_LINE;
 import static utils.Constants.BACKSPACE;
 import com.google.inject.Inject;
+import history.BaseHistoryHandler;
 
 public class InputHandler implements BaseInputHandler {
 
     BaseAutoCompleteHandler autoCompleteHandler;
     BaseCommandHandler commandHandler;
+    BaseHistoryHandler historyHandler;
     BufferedReader bufferedReader;
 
     @Inject
-    InputHandler(BaseAutoCompleteHandler autoCompleteHandler, BaseCommandHandler commandHandler) {
+    InputHandler(BaseAutoCompleteHandler autoCompleteHandler, BaseCommandHandler commandHandler, BaseHistoryHandler historyHandler) {
         this.autoCompleteHandler = autoCompleteHandler;
         this.commandHandler = commandHandler;
+        this.historyHandler = historyHandler;
         this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
     }
 
@@ -70,6 +73,9 @@ public class InputHandler implements BaseInputHandler {
                 case '\r': {
                     // Output will come from new line
                     System.out.print(NEW_LINE);
+
+                    // Store current command
+                    historyHandler.recordCommand(input);
 
                     // Send command to command handler
                     commandHandler.handleCommand(input);

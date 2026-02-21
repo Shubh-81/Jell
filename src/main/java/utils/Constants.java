@@ -4,6 +4,7 @@ import commands.BaseCommand;
 import commands.ChangeDirectoryCommand;
 import commands.EchoCommand;
 import commands.ExitCommand;
+import commands.HistoryCommand;
 import commands.ListDirectoryCommand;
 import commands.PwdCommand;
 import commands.TypeCommand;
@@ -57,7 +58,8 @@ public class Constants {
             "pwd", PwdCommand::new,
             "type", TypeCommand::new,
             "exit", ExitCommand::new,
-            "ls", ListDirectoryCommand::new
+            "ls", ListDirectoryCommand::new,
+            "history", HistoryCommand::new
     );
     public static final Set<String> BUILTIN_COMMANDS = COMMANDS.keySet();
 }
