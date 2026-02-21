@@ -8,4 +8,8 @@
 
 set -e # Exit on failure
 
-exec java -jar /tmp/codecrafters-build-shell-java/codecrafters-shell.jar "$@"
+exec java \
+  -jar /tmp/codecrafters-build-shell-java/codecrafters-shell.jar \
+  -Dexec.mainClass="NewMain" \
+  "$@" \
+    2> >(grep -v '^WARNING:')

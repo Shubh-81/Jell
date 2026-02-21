@@ -1,75 +1,71 @@
+import DataStructures.Trie;
+import utils.SystemProperties;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.HashSet;
 
-public class AutoCompleteHandler {
+import static utils.Constants.BELL_CHAR;
+import static utils.Constants.BLANK_SPACE;
+import static utils.Constants.BUILTIN_COMMANDS;
+import static utils.Constants.NEW_LINE;
 
-    private final Set<String> commands;
-    private final String[] builtinCommands = {"echo", "exit"};
+public class AutoCompleteHandler implements BaseAutoCompleteHandler {
+
     private boolean firstTab;
+    private final Trie trie;
 
-    AutoCompleteHandler(Set<String> executables) {
+    AutoCompleteHandler() {
         this.firstTab = true;
-        for (String command: builtinCommands) {
-            executables.add(command);
-        }
-        commands = executables;
+
+        // Gets executables names from system properties
+        Set<String> executables = new HashSet<>(SystemProperties.getExecutables().keySet());
+        // Adds builtin commands to executables
+        executables.addAll(BUILTIN_COMMANDS);
+
+        // Build trie for efficient prefix matching
+        trie = new Trie(new ArrayList<>(executables));
     }
 
-    private String handleMultipleMatches(String input, Set<String> matches) {
-        String prefix = null;
-        for (String match: matches) {
-            if (prefix == null) {
-                prefix = match;
-                continue;
-            }
-            int l = Math.min(prefix.length(), match.length());
-            for (int i = 0; i <= l; i++) {
-                if (i == l || prefix.charAt(i) != match.charAt(i)) {
-                    if (i == 0) {
-                        prefix = "";
-                        break;
-                    }
-                    prefix = prefix.substring(0, i);
-                    break;
-                }
-            }
-        }
+    private void handleOutput(ArrayList<String> matches, String input) {
 
-        if (prefix != null && prefix.length() > 0) {
-            return prefix;
-        }
-
+        // Incase of first tab, just ring the bell
         if (firstTab) {
-            System.out.print('\007');
-            firstTab = !firstTab;
-            return "";
+            System.out.print(BELL_CHAR);
+            firstTab = false;
+            return;
         }
 
-        System.out.print("\n\r");
+        // Print possible matches in new line
+        System.out.print(NEW_LINE);
         for (String match: matches) {
             System.out.print(input + match + "  ");
         }
 
-        System.out.print("\n\r$ " + input);
-        return "";
+        // Throw user back to same point
+        System.out.print(NEW_LINE + "$ " + input);
     }
 
     public String autoComplete(String input) {
-        String match = "";
-        Set<String> matches = new TreeSet<>();
-
-
-        for (String command: commands) {
-            if (command.startsWith(input)) {
-                match = command.substring(input.length());
-                matches.add(match);
+        // Get extension beyond current command
+        String match = trie.match(input);
+        // Get all matches
+        ArrayList<String> matches = trie.getMatches();
+        // For a single match simply return the match
+        if (match != null && !match.isEmpty()) {
+            // Add blank space as only one command is possible, user will continue ahead
+            if (matches.size() == 1) {
+                match += BLANK_SPACE;
             }
+            return match;
         }
 
-        if (matches.size() != 1) {
-            return handleMultipleMatches(input, matches);
+        if (matches != null) {
+            Collections.sort(matches);
         }
-
-        return match + " ";
+        handleOutput(matches, input);
+        return "";
     }
+
 }
