@@ -23,6 +23,10 @@ public class HistoryHandler implements BaseHistoryHandler {
         return previousCommands;
     }
 
+    public static void addCommand(String command) {
+        previousCommands.add(command);
+    }
+
     @Override
     public void recordCommand(String command) {
         index = 0;

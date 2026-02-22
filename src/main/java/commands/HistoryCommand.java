@@ -1,9 +1,13 @@
 package commands;
 
 import customErrors.CommandException;
+import customErrors.FileNotFoundError;
 import customErrors.InvalidArguments;
 import history.HistoryHandler;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -23,13 +27,39 @@ public class HistoryCommand implements BaseCommand {
         return HISTORY.getName();
     }
 
+    private void updateHistory(File file) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            HistoryHandler.addCommand(line);
+        }
+    }
+
     public void execute(InputStream in, OutputStream out) throws Exception {
         int maxHistory = -1;
         if (args.size() > 1) {
-            try {
-                maxHistory = Integer.parseInt(args.get(1));
-            } catch (Exception e) {
-                throw new CommandException(getName(), new InvalidArguments());
+            switch (args.get(1)) {
+                case "-r" -> {
+                    if (args.size() > 2) {
+                        String filePath = args.get(2);
+
+                        File file = new File(filePath);
+                        if (!file.exists() || file.isDirectory()) {
+                            throw new CommandException(getName(), new FileNotFoundError(filePath));
+                        }
+
+                        updateHistory(file);
+                        return;
+                    }
+                }
+                default -> {
+                    try {
+                        maxHistory = Integer.parseInt(args.get(1));
+                    } catch (Exception e) {
+                        throw new CommandException(getName(), new InvalidArguments());
+                    }
+                }
             }
         }
 
