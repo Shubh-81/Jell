@@ -45,6 +45,8 @@ public class HistoryCommand implements BaseCommand {
             bw.write(command);
             bw.newLine();
         }
+
+        bw.flush();
     }
 
     private boolean readHistoryFromFile() throws Exception {
