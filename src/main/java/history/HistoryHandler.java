@@ -25,10 +25,13 @@ public class HistoryHandler implements BaseHistoryHandler {
     private static int index = 0;
     // Stores index till which history is appended
     private static int appendIndex = 0;
+    // Stores count of history read from file
+    private static int historyCountFromFile;
 
     @Inject
     public HistoryHandler() {
         previousCommands = new ArrayList<>();
+        historyCountFromFile = 0;
         // Add commands from file to array
         readHistoryFromFile(SystemProperties.getHistoryPath());
     }
@@ -70,6 +73,8 @@ public class HistoryHandler implements BaseHistoryHandler {
         while ((line = br.readLine()) != null) {
             HistoryHandler.addCommand(line);
         }
+
+        historyCountFromFile = getPreviousCommands().size();
     }
 
     public static void writeHistory() {
@@ -85,7 +90,7 @@ public class HistoryHandler implements BaseHistoryHandler {
                 file.createNewFile();
             }
 
-            writeHistory(file, 0, true);
+            writeHistory(file, historyCountFromFile, true);
         } catch (Exception e) {
             // Fail silently, don't need to throw error
         }
