@@ -10,10 +10,12 @@ public class SystemProperties {
 
     public static final HashMap<String, String> executables;
     public static final String path;
+    public static final String historyFilePath;
     public static final List<String> homePath;
     public static final String currentPath;
 
     static {
+        historyFilePath = System.getenv("HISTFILE");
         path = System.getenv("PATH");
         homePath = List.of(System.getenv("HOME").split(FORWARD_SLASH));
         currentPath = System.getProperty("user.dir");
@@ -48,4 +50,6 @@ public class SystemProperties {
     public static List<String> getHomePath() {
         return homePath;
     }
+
+    public static String getHistoryPath() { return  historyFilePath; }
 }

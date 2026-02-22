@@ -1,7 +1,15 @@
 package history;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import customErrors.InvalidArguments;
+import utils.SystemProperties;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 import static utils.Constants.BACKSPACE;
@@ -9,6 +17,7 @@ import static utils.Constants.BELL_CHAR;
 
 @Singleton
 public class HistoryHandler implements BaseHistoryHandler {
+
     private static ArrayList<String> previousCommands;
     // Stores current unsaved command
     private static String currentCommand;
@@ -17,8 +26,69 @@ public class HistoryHandler implements BaseHistoryHandler {
     // Stores index till which history is appended
     private static int appendIndex = 0;
 
+    @Inject
     public HistoryHandler() {
         previousCommands = new ArrayList<>();
+        // Add commands from file to array
+        readHistoryFromFile(SystemProperties.getHistoryPath());
+    }
+
+    public void readHistoryFromFile(String filePath) {
+        try {
+            File file = new File(filePath);
+
+            if (file.isDirectory()) {
+                throw new InvalidArguments();
+            }
+
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            updateHistory(file);
+        } catch (Exception e) {
+            // Fail silently, don't need to throw error
+        }
+    }
+
+    public static void writeHistory(File file, int startIndex, boolean append) throws Exception {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file, append));
+        ArrayList<String> commands = HistoryHandler.getPreviousCommands();
+
+        for (int index = startIndex; index < commands.size(); index++) {
+            bw.write(commands.get(index));
+            bw.newLine();
+        }
+
+        bw.flush();
+    }
+
+    public static void updateHistory(File file) throws Exception {
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            HistoryHandler.addCommand(line);
+        }
+    }
+
+    public static void writeHistory() {
+        String filePath = SystemProperties.getHistoryPath();
+        try {
+            File file = new File(filePath);
+
+            if (file.isDirectory()) {
+                throw new InvalidArguments();
+            }
+
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            writeHistory(file, 0, true);
+        } catch (Exception e) {
+            // Fail silently, don't need to throw error
+        }
     }
 
     public static ArrayList<String> getPreviousCommands() {

@@ -30,27 +30,6 @@ public class HistoryCommand implements BaseCommand {
         return HISTORY.getName();
     }
 
-    private void updateHistory(File file) throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader(file));
-
-        String line;
-        while ((line = br.readLine()) != null) {
-            HistoryHandler.addCommand(line);
-        }
-    }
-
-    private void writeHistory(File file, int startIndex, boolean append) throws Exception {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(file, append));
-        ArrayList<String> commands = HistoryHandler.getPreviousCommands();
-
-        for (int index = startIndex; index < commands.size(); index++) {
-            bw.write(commands.get(index));
-            bw.newLine();
-        }
-
-        bw.flush();
-    }
-
     private boolean readHistoryFromFile() throws Exception {
         if (args.size() > 2) {
             String filePath = args.get(2);
@@ -60,7 +39,7 @@ public class HistoryCommand implements BaseCommand {
                 throw new CommandException(getName(), new FileNotFoundError(filePath));
             }
 
-            updateHistory(file);
+            HistoryHandler.updateHistory(file);
             return true;
         }
 
@@ -81,7 +60,7 @@ public class HistoryCommand implements BaseCommand {
                 file.createNewFile();
             }
 
-            writeHistory(file, 0,false);
+            HistoryHandler.writeHistory(file, 0,false);
             return true;
         }
 
@@ -98,7 +77,7 @@ public class HistoryCommand implements BaseCommand {
                 throw new CommandException(getName(), new FileNotFoundError(filePath));
             }
 
-            writeHistory(file, HistoryHandler.getAppendIndex(),true);
+            HistoryHandler.writeHistory(file, HistoryHandler.getAppendIndex(),true);
             HistoryHandler.updatedAppendIndex();
             return true;
         }
