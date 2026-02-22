@@ -6,8 +6,10 @@ import customErrors.InvalidArguments;
 import history.HistoryHandler;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -36,20 +38,58 @@ public class HistoryCommand implements BaseCommand {
         }
     }
 
+    private void writeHistory(File file) throws Exception {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+
+        for (String command: HistoryHandler.getPreviousCommands()) {
+            bw.write(command);
+            bw.newLine();
+        }
+    }
+
+    private boolean readHistoryFromFile() throws Exception {
+        if (args.size() > 2) {
+            String filePath = args.get(2);
+
+            File file = new File(filePath);
+            if (!file.exists() || file.isDirectory()) {
+                throw new CommandException(getName(), new FileNotFoundError(filePath));
+            }
+
+            updateHistory(file);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean writeHistoryToFile() throws Exception {
+        if (args.size() > 2) {
+            String filePath = args.get(2);
+
+            File file = new File(filePath);
+            if (!file.exists() || file.isDirectory()) {
+                throw new CommandException(getName(), new FileNotFoundError(filePath));
+            }
+
+            writeHistory(file);
+            return true;
+        }
+
+        return false;
+    }
+
     public void execute(InputStream in, OutputStream out) throws Exception {
         int maxHistory = -1;
         if (args.size() > 1) {
             switch (args.get(1)) {
                 case "-r" -> {
-                    if (args.size() > 2) {
-                        String filePath = args.get(2);
-
-                        File file = new File(filePath);
-                        if (!file.exists() || file.isDirectory()) {
-                            throw new CommandException(getName(), new FileNotFoundError(filePath));
-                        }
-
-                        updateHistory(file);
+                    if (readHistoryFromFile()) {
+                        return;
+                    }
+                }
+                case "-w" -> {
+                    if (writeHistoryToFile()) {
                         return;
                     }
                 }
