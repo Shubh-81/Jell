@@ -68,8 +68,13 @@ public class HistoryCommand implements BaseCommand {
             String filePath = args.get(2);
 
             File file = new File(filePath);
-            if (!file.exists() || file.isDirectory()) {
-                throw new CommandException(getName(), new FileNotFoundError(filePath));
+
+            if (file.isDirectory()) {
+                throw new CommandException(getName(), new InvalidArguments());
+            }
+
+            if (!file.exists()) {
+                file.createNewFile();
             }
 
             writeHistory(file);
