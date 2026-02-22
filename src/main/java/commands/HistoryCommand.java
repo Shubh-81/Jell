@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static commands.ShellBuiltins.HISTORY;
@@ -38,11 +39,12 @@ public class HistoryCommand implements BaseCommand {
         }
     }
 
-    private void writeHistory(File file) throws Exception {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+    private void writeHistory(File file, int startIndex, boolean append) throws Exception {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file, append));
+        ArrayList<String> commands = HistoryHandler.getPreviousCommands();
 
-        for (String command: HistoryHandler.getPreviousCommands()) {
-            bw.write(command);
+        for (int index = startIndex; index < commands.size(); index++) {
+            bw.write(commands.get(index));
             bw.newLine();
         }
 
@@ -79,7 +81,25 @@ public class HistoryCommand implements BaseCommand {
                 file.createNewFile();
             }
 
-            writeHistory(file);
+            writeHistory(file, 0,false);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean appendHistoryToFile() throws Exception {
+        if (args.size() > 2) {
+            String filePath = args.get(2);
+
+            File file = new File(filePath);
+
+            if (!file.exists() || file.isDirectory()) {
+                throw new CommandException(getName(), new FileNotFoundError(filePath));
+            }
+
+            writeHistory(file, HistoryHandler.getAppendIndex(),true);
+            HistoryHandler.updatedAppendIndex();
             return true;
         }
 
@@ -97,6 +117,11 @@ public class HistoryCommand implements BaseCommand {
                 }
                 case "-w" -> {
                     if (writeHistoryToFile()) {
+                        return;
+                    }
+                }
+                case "-a" -> {
+                    if (appendHistoryToFile()) {
                         return;
                     }
                 }

@@ -14,6 +14,8 @@ public class HistoryHandler implements BaseHistoryHandler {
     private static String currentCommand;
     // Stores current index to be returned
     private static int index = 0;
+    // Stores index till which history is appended
+    private static int appendIndex = 0;
 
     public HistoryHandler() {
         previousCommands = new ArrayList<>();
@@ -21,6 +23,14 @@ public class HistoryHandler implements BaseHistoryHandler {
 
     public static ArrayList<String> getPreviousCommands() {
         return previousCommands;
+    }
+
+    public static int getAppendIndex() {
+        return appendIndex;
+    }
+
+    public static void updatedAppendIndex() {
+        appendIndex = previousCommands.size();
     }
 
     public static void addCommand(String command) {
