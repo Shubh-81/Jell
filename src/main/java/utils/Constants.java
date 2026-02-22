@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 public class Constants {
     public static final char DOLLAR_SIGN = '$';
     public static final String NEW_LINE = "\r\n";
-    public static final String CARRIAGE_RETURN = "\r";
     public static final String BACKSPACE = "\b \b";
     public static final char BELL_CHAR = '\007';
     public static final char SINGLE_QUOTE = '\'';
@@ -27,6 +26,16 @@ public class Constants {
     public static final char BLANK_SPACE = ' ';
     public static final char BACKSLASH = '\\';
     public static final char BACKTICK = '`';
+    public static final char ENTER = '\n';
+    public static final char CARRIAGE = '\r';
+    public static final char TAB = '\t';
+    public static final char BACKSPACE_CHAR = '\b';
+    public static final int BACKSPACE_NUMERIC = 127;
+    public static final int CTRL_C = 3;
+    public static final int ESCAPE = 27;
+    public static final char BRACKET = '[';
+    public static final char CHAR_A = 'A';
+    public static final char CHAR_B = 'B';
     public static final String TILDE = "~";
     public static final String DOT = ".";
     public static final String DASH = "-";

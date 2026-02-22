@@ -1,25 +1,29 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import static utils.Constants.DOLLAR_SIGN;
 import static utils.Constants.NEW_LINE;
 import static utils.Constants.BACKSPACE;
+
 import com.google.inject.Inject;
 import history.BaseHistoryHandler;
+import keyParser.BaseKeyParser;
+import keys.ArrowKey;
+import keys.BaseKey;
+import keys.CharKey;
+import keys.ControlKey;
+import utils.Direction;
 
 public class InputHandler implements BaseInputHandler {
 
     BaseAutoCompleteHandler autoCompleteHandler;
     BaseCommandHandler commandHandler;
     BaseHistoryHandler historyHandler;
-    BufferedReader bufferedReader;
+    BaseKeyParser keyParser;
 
     @Inject
-    InputHandler(BaseAutoCompleteHandler autoCompleteHandler, BaseCommandHandler commandHandler, BaseHistoryHandler historyHandler) {
+    InputHandler(BaseAutoCompleteHandler autoCompleteHandler, BaseCommandHandler commandHandler, BaseHistoryHandler historyHandler, BaseKeyParser keyParser) {
         this.autoCompleteHandler = autoCompleteHandler;
         this.commandHandler = commandHandler;
         this.historyHandler = historyHandler;
-        this.bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+        this.keyParser = keyParser;
     }
 
     // Loops to keep on taking user input
@@ -40,37 +44,48 @@ public class InputHandler implements BaseInputHandler {
         // Stores user input
         String input = "";
 
-        // Stores current character
-        int ch;
-
         // Helper to break loop from switch case
         boolean terminateCommand = false;
 
-        while (!terminateCommand && ((ch = bufferedReader.read()) != -1)) {
-            switch ((char) ch) {
+        while (!terminateCommand) {
+
+            BaseKey key = keyParser.readKey();
+
+            switch (key) {
+
+                case ArrowKey ak -> {
+                    switch (ak.direction()) {
+                        // Move up in history
+                        case Direction.UP -> {
+                            input = historyHandler.handleUp(input);
+                        }
+                        // Move down in history
+                        case Direction.DOWN -> {
+
+                        }
+                    }
+                }
 
                 // Current input terminated by Ctrl + C
-                case 3: {
+                case ControlKey.CTRL_C -> {
                     terminateCommand = true;
                     System.out.print(NEW_LINE);
-                    break;
+
+                    historyHandler.resetIndex();
                 }
 
                 // Tab invokes auto complete handler
-                case '\t': {
+                case ControlKey.TAB -> {
                     // Auto complete prediction from handler
                     String completion = autoCompleteHandler.autoComplete(input);
                     input += completion;
 
                     // Display completion to user
                     System.out.print(completion);
-
-                    break;
                 }
 
                 // Enter invokes command execution
-                case '\n':
-                case '\r': {
+                case ControlKey.ENTER -> {
                     // Output will come from new line
                     System.out.print(NEW_LINE);
 
@@ -81,13 +96,11 @@ public class InputHandler implements BaseInputHandler {
                     commandHandler.handleCommand(input);
 
                     terminateCommand = true;
-                    break;
                 }
 
                 // Handle backspace
-                case 127:
-                case '\b': {
-                    // If input is non empty
+                case ControlKey.BACKSPACE -> {
+                    // If input is non-empty
                     if (!input.isEmpty()) {
                         // Remove last character
                         input = input.substring(0, input.length() - 1);
@@ -95,15 +108,16 @@ public class InputHandler implements BaseInputHandler {
                         // Shift cursor to left
                         System.out.print(BACKSPACE);
                     }
-
-                    break;
                 }
 
-                // Rest characters are printed in console and added to input
-                default: {
-                    System.out.print((char) ch);
-                    input += (char) ch;
+                // Default character keys
+                case CharKey ck -> {
+                    System.out.print(ck.ch());
+                    input += ck.ch();
                 }
+
+                // Do nothing
+                default -> {}
             }
         }
     }

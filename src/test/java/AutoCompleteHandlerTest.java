@@ -1,10 +1,8 @@
 import java.util.HashMap;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.mockito.MockedStatic;
-import utils.SystemProperties;
+import utils.ExecutableProvider;
 
-import static org.mockito.Mockito.mockStatic;
 
 public class AutoCompleteHandlerTest {
     @Test
@@ -16,11 +14,8 @@ public class AutoCompleteHandlerTest {
         executables.put("exit", "/bin/exit");
         executables.put("donut", "/usr/local/bin/donut");
 
-        MockedStatic<SystemProperties> mocked = mockStatic(SystemProperties.class);
-        mocked.when(SystemProperties::getExecutables)
-                .thenReturn(executables);
-
-        AutoCompleteHandler autoCompleteHandler = new AutoCompleteHandler();
+        ExecutableProvider mockProvider = () -> executables;
+        AutoCompleteHandler autoCompleteHandler = new AutoCompleteHandler(mockProvider);
 
         String ex = autoCompleteHandler.autoComplete("e");
         assertEquals("", ex);

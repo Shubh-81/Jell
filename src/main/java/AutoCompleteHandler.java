@@ -1,4 +1,6 @@
 import DataStructures.Trie;
+import com.google.inject.Inject;
+import utils.ExecutableProvider;
 import utils.SystemProperties;
 
 import java.util.ArrayList;
@@ -16,11 +18,12 @@ public class AutoCompleteHandler implements BaseAutoCompleteHandler {
     private boolean firstTab;
     private final Trie trie;
 
-    AutoCompleteHandler() {
+    @Inject
+    AutoCompleteHandler(ExecutableProvider executableProvider) {
         this.firstTab = true;
 
         // Gets executables names from system properties
-        Set<String> executables = new HashSet<>(SystemProperties.getExecutables().keySet());
+        Set<String> executables = new HashSet<>(executableProvider.getExecutables().keySet());
         // Adds builtin commands to executables
         executables.addAll(BUILTIN_COMMANDS);
 
