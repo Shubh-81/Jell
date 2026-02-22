@@ -61,7 +61,7 @@ public class InputHandler implements BaseInputHandler {
                         }
                         // Move down in history
                         case Direction.DOWN -> {
-
+                            input = historyHandler.handleDown(input);
                         }
                     }
                 }

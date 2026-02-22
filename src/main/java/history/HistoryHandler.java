@@ -54,7 +54,7 @@ public class HistoryHandler implements BaseHistoryHandler {
 
         // If no commands are left, ring bell
         if (previousCommands.size() < index) {
-            index += 1;
+            index -= 1;
             System.out.print(BELL_CHAR);
             return currentCommand;
         }
@@ -68,7 +68,33 @@ public class HistoryHandler implements BaseHistoryHandler {
         return prevCommand;
     }
 
-    public void handleDown() {
+    public String handleDown(String currentCommand) {
+        // If we can't go down, print bell character
+        if (index == 0) {
+            System.out.print(BELL_CHAR);
+            return currentCommand;
+        }
 
+        // Clear current command from screen
+        clearCommand(currentCommand);
+
+        index -= 1;
+        String nextCommand;
+
+        // If no commands are left, ring bell
+        if (previousCommands.size() < index) {
+            index += 1;
+            System.out.print(BELL_CHAR);
+            return currentCommand;
+        }
+
+        if (index == 0) {
+            nextCommand = HistoryHandler.currentCommand;
+        } else {
+            nextCommand = previousCommands.get(previousCommands.size() - index);
+        }
+
+        System.out.print(nextCommand);
+        return nextCommand;
     }
 }
