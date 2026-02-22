@@ -1,5 +1,7 @@
 package commands;
 
+import utils.StartupShutdownHandlers;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -16,8 +18,7 @@ public class ExitCommand implements BaseCommand {
     }
 
     public void execute(InputStream in, OutputStream out) throws Exception {
-        // Revert back to non raw mode
-        Runtime.getRuntime().exec(new String[]{"/bin/sh", "-c", "stty cooked echo < /dev/tty"});
+        StartupShutdownHandlers.onShutDown();
 
         // Exit program
         System.exit(0);
